@@ -1,0 +1,61 @@
+import java.io.IOException;
+import java.io.FileWriter;
+import java.io.File;
+
+public class RobotRuntime {
+    class pinout {
+	String path;
+	boolean forward;
+	short dutyCycle;
+	File direction;
+	public pinout (String s) {
+	
+	    path = s;
+	}
+
+    }
+
+    public static void main(String[] args) {
+	initialization();
+
+
+    }
+
+    private static void initialization(){
+	gpiostart("4");
+	gpiostart("14");
+	gpiostart("7");
+	gpiostart("17");
+	gpiostart("27");
+
+
+    }
+    
+    private static void gpiostart(String p){
+	try {
+	    FileWriter export = new FileWriter("/sys/class/gpio/export");
+	    File exportFileCheck = new File("/sys/class/gpio/gpio"+p);
+            if (exportFileCheck.exists()) {
+                gpioend(p);
+	    }
+	} catch(IOException e){
+	    e.printStackTrace();
+	}
+    }
+
+    private static void gpioend(String p) {
+	try {
+	    FileWriter unexport = new FileWriter("/sys/class/gpio/unexport");
+	    unexport.write(p);
+	    unexport.flush();
+	}catch(IOException e) {
+	    e.printStackTrace();
+	}
+
+
+    }   
+
+
+}
+
+
