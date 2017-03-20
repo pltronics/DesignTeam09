@@ -20,9 +20,9 @@ public class RobotRuntime {
 
     public static void main(String[] args) throws InterruptedException {
 	initialization();
-	try {
+	/*	try {
 	FileWriter value = new FileWriter("/sys/class/gpio/gpio4/value");
-	Scanner s = new Scanner(System.in);
+      	Scanner s = new Scanner(System.in);
 	int h=-1;
 	int l=-1;
 	System.out.println("Enter 1 time");
@@ -48,10 +48,16 @@ public class RobotRuntime {
 
 	}
 
+
+	
 	} catch(IOException e){
         e.printStackTrace();
         }
-
+	*/
+	HttpServer server = HttpServer.create(new InetSocketAddress(8000), 0);
+	server.createContext("/test", new MyHandler());
+	server.setExecutor(null); // creates a default executor
+	server.start();
     }
 
     private static void initialization(){
@@ -62,6 +68,29 @@ public class RobotRuntime {
 	gpiostart("5");
 
 
+    }
+
+    static class MyHandler implements HttpHandler throws InterruptedException {
+	        @Override
+		public void handle(HttpExchange t) throws IOException {
+		    String response = "This is the response";
+		    t.sendResponseHeaders(200, response.length());
+		    OutputStream os = t.getResponseBody();
+		    os.write(response.getBytes());
+		    os.close();
+	  	try {
+	FileWriter value = new FileWriter("/sys/class/gpio/gpio4/value");
+		value.write("1");
+		value.flush();
+		for(int i = 0; i < 5; i++)
+			Thread.sleep(1);
+		value.write("0");
+		value.flush();
+		for(int i = 0; i < 5; i++)
+			Thread.sleep(1);
+       	} catch(IOException e){
+        e.printStackTrace();
+        }
     }
     
     private static void gpiostart(String p){
